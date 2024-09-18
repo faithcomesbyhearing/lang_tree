@@ -1,7 +1,10 @@
 package main
 
-import "fmt"
+import (
+	"context"
+	"lang_tree/search"
+)
 
 func main() {
-	fmt.Println("Hello World")
+	var tree = search.NewLanguageTree(context.Background())
 }
