@@ -2,6 +2,7 @@ package build
 
 import (
 	"encoding/csv"
+	"encoding/json"
 	"fmt"
 	"io"
 	"lang_tree/db"
@@ -9,9 +10,25 @@ import (
 	"strconv"
 )
 
+func BuildLanguageTree() {
+	var numLanguages = 26879
+	languages := loadGlottoLanguoid()
+	languages = loadIso6393(languages)
+	languages = loadAIToolCompatibility(languages, "../data/espeak.tab", db.ESpeak, 1, 3)
+	languages = loadAIToolCompatibility(languages, "../data/mms_asr.tab", db.MMSASR, 0, 1)
+	languages = loadAIToolCompatibility(languages, "../data/mms_lid.tab", db.MMSLID, 0, 1)
+	languages = loadAIToolCompatibility(languages, "../data/mms_tts.tab", db.MMSTTS, 0, 1)
+	languages = loadAIToolCompatibility(languages, "../data/whisper.tab", db.Whisper, 1, 0)
+	if len(languages) != numLanguages {
+		fmt.Println("Load Iso6393: Expected ", numLanguages, " got ", len(languages))
+		os.Exit(1)
+	}
+	outputJSON(languages)
+}
+
 func loadGlottoLanguoid() []db.Language {
 	var languages []db.Language
-	file, err := os.Open("db/language/languoid.tab")
+	file, err := os.Open("../data/languoid.tab")
 	if err != nil {
 		panic(err)
 	}
@@ -58,7 +75,7 @@ func loadIso6393(languages []db.Language) []db.Language {
 	var notInIso = make(map[string]bool)
 	var notInGlotto = make(map[string]bool)
 	fmt.Println("Num Glotto Records", len(languages))
-	file, err := os.Open("db/language/iso-639-3.tab")
+	file, err := os.Open("../data/iso-639-3.tab")
 	if err != nil {
 		panic(err)
 	}
@@ -111,7 +128,7 @@ func loadIso6393(languages []db.Language) []db.Language {
 	return languages
 }
 
-func loadAIToolCompatibility(languages []db.Language, filePath string, toolName db.ToolName, iso3Col int, nameCol int) []db.Language {
+func loadAIToolCompatibility(languages []db.Language, filePath string, toolName string, iso3Col int, nameCol int) []db.Language {
 	file, err := os.Open(filePath)
 	if err != nil {
 		panic(err)
@@ -155,7 +172,7 @@ func loadAIToolCompatibility(languages []db.Language, filePath string, toolName 
 	return languages
 }
 
-func setLanguage(language db.Language, toolName db.ToolName) db.Language {
+func setLanguage(language db.Language, toolName string) db.Language {
 	switch toolName {
 	case db.ESpeak:
 		language.ESpeak = true
@@ -171,4 +188,15 @@ func setLanguage(language db.Language, toolName db.ToolName) db.Language {
 		panic("Unknown tool name: " + toolName)
 	}
 	return language
+}
+
+func outputJSON(languages []db.Language) {
+	bytes, err := json.MarshalIndent(languages, "", "    ")
+	if err != nil {
+		panic(err)
+	}
+	err = os.WriteFile("../db/language_tree.json", bytes, 0644)
+	if err != nil {
+		panic(err)
+	}
 }

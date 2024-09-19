@@ -1,13 +1,11 @@
 package db
 
-type ToolName string
-
 const (
-	ESpeak  ToolName = "espeak"
-	MMSASR  ToolName = "mms_asr"
-	MMSLID  ToolName = "mms_lid"
-	MMSTTS  ToolName = "mms_tts"
-	Whisper ToolName = "whisper"
+	ESpeak  = "espeak"
+	MMSASR  = "mms_asr"
+	MMSLID  = "mms_lid"
+	MMSTTS  = "mms_tts"
+	Whisper = "whisper"
 )
 
 type Language struct {
