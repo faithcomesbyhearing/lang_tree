@@ -2,37 +2,15 @@ package search
 
 import (
 	"context"
-	"encoding/json"
-	"fmt"
 	"lang_tree/db"
-	"os"
-	"sort"
 	"testing"
 )
 
-var result []*db.Language
-var count int
-
-func TestLanguageTree_BuildTree(t *testing.T) {
-	var tree = NewLanguageTree(context.Background())
-	tree.Load()
-	fmt.Println("count:", len(tree.table))
-	recursiveDescent(tree.roots)
-	sort.Slice(result, func(i, j int) bool {
-		return result[i].GlottoId < result[j].GlottoId
-	})
-	if len(tree.table) != len(result) {
-		t.Errorf("len(tree.table) = %d; actual %d", len(tree.table), len(result))
-	}
-	fmt.Println("count: ", count)
-	outputResult(result)
-}
-
 func TestLanguageTree_Search(t *testing.T) {
 	var tree = NewLanguageTree(context.Background())
-	status := tree.Load()
-	if status.IsErr {
-		t.Error("status.IsErr:", status)
+	err := tree.Load()
+	if err != nil {
+		t.Error("status.IsErr:", err)
 	}
 	doSearch(t, tree, "eng", "whisper", 0, []string{"stan1293"})
 	doSearch(t, tree, "spa", "whisper", 0, []string{"stan1288"})
@@ -58,7 +36,7 @@ func TestLanguageTree_SampleData(t *testing.T) {
 	langs = append(langs, db.Language{Name: "Australian", GlottoId: "australian", ParentId: "stan1293", Iso6393: "aust"})
 
 	tree := NewLanguageTree(context.Background())
-	tree.table = langs
+	tree.Table = langs
 	searchType := `whisper`
 	tree.validateSearch(searchType)
 	tree.buildTree()
@@ -89,9 +67,9 @@ func setWhisper(tree LanguageTree, glottoIds []string) {
 }
 
 func doSearch(t *testing.T, tree LanguageTree, iso639 string, search string, distance int, result []string) {
-	langs, dist, status := tree.Search(iso639, search)
-	if status.IsErr {
-		t.Error("status.IsErr:", status)
+	langs, dist, err := tree.Search(iso639, search)
+	if err != nil {
+		t.Error("status.IsErr:", err)
 	}
 	if dist != distance {
 		t.Error("Expected Depth:", distance, "Found Distance:", dist)
@@ -109,24 +87,5 @@ func doSearch(t *testing.T, tree LanguageTree, iso639 string, search string, dis
 				t.Error("Expected lang", lang, "Found lang", lang.GlottoId)
 			}
 		}
-	}
-}
-
-func recursiveDescent(langs []*db.Language) {
-	for _, lang := range langs {
-		result = append(result, lang)
-		count++
-		recursiveDescent(lang.Children)
-	}
-}
-
-func outputResult(results []*db.Language) {
-	bytes, err := json.MarshalIndent(results, "", "    ")
-	if err != nil {
-		panic(err)
-	}
-	err = os.WriteFile("../db/language/language_tree.jason2", bytes, 0644)
-	if err != nil {
-		panic(err)
 	}
 }

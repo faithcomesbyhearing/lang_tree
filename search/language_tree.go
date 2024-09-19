@@ -2,9 +2,8 @@ package search
 
 import (
 	"context"
-	"dataset"
-	log "dataset/logger"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"lang_tree/db"
 	"os"
@@ -14,8 +13,8 @@ import (
 
 type LanguageTree struct {
 	ctx    context.Context
-	table  []db.Language
-	roots  []*db.Language
+	Table  []db.Language
+	Roots  []*db.Language
 	idMap  map[string]*db.Language
 	isoMap map[string]*db.Language
 }
@@ -28,54 +27,59 @@ func NewLanguageTree(ctx context.Context) LanguageTree {
 	return l
 }
 
-func (l *LanguageTree) Load() dataset.Status {
-	status := l.loadTable()
-	if status.IsErr {
-		return status
+func (l *LanguageTree) Load() error {
+	err := l.loadTable()
+	if err != nil {
+		return err
 	}
-	status = l.buildTree()
-	return status
+	err = l.buildTree()
+	return err
 }
 
-func (l *LanguageTree) Search(iso6393 string, search string) ([]*db.Language, int, dataset.Status) {
+func (l *LanguageTree) Search(iso6393 string, search string) ([]*db.Language, int, error) {
 	var results []*db.Language
 	var distance int
-	var status dataset.Status
 	var lang *db.Language
 	lang, ok := l.isoMap[iso6393]
 	if !ok {
-		status = log.ErrorNoErr(l.ctx, 400, "iso code ", iso6393, " is not known.")
-		return results, distance, status
+		//status = log.ErrorNoErr(l.ctx, 400, "iso code ", iso6393, " is not known.")
+		//err := &db.LangTreeErr{Message: "iso code " + iso6393 + " is not known."}
+		err := errors.New("iso code " + iso6393 + " is not known.")
+		//return results, distance, status
+		return results, distance, err
 	}
 	if !l.validateSearch(search) {
-		status = log.ErrorNoErr(l.ctx, 400, "Search parameter", search, "is not known")
-		return results, distance, status
+		//status = log.ErrorNoErr(l.ctx, 400, "Search parameter", search, "is not known")
+		//err := &db.LangTreeErr{Message: "Search parameter" + search + "is not known"}
+		err := errors.New("Search parameter" + search + "is not known")
+		return results, distance, err
 	}
 	results, distance = l.searchRelatives(lang, search)
-	return results, distance, status
+	return results, distance, nil
 }
 
-func (l *LanguageTree) loadTable() dataset.Status {
-	var status dataset.Status
+func (l *LanguageTree) loadTable() error {
 	// Read json file of languages
-	filename := "../db/language/language_tree.jason"
+	filename := "../db/language_tree.json"
 	content, err := os.ReadFile(filename)
 	if err != nil {
-		return log.Error(l.ctx, 500, err, "Error when opening file: ", filename)
+		return err
+		//return &db.LangTreeErr{Err: err, Message: "Error when opening file: " + filename}
+		//return log.Error(l.ctx, 500, err, "Error when opening file: ", filename)
 	}
 	// Parse json into Language slice
-	err = json.Unmarshal(content, &l.table)
-	if err != nil {
-		return log.Error(l.ctx, 500, err, "Error during Unmarshal(): ", filename)
-	}
-	return status
+	err = json.Unmarshal(content, &l.Table)
+	//if err != nil {
+	//return &db.LangTreeErr{Err: err, Message: "Error when parsing file: " + filename}
+	//return log.Error(l.ctx, 500, err, "Error during Unmarshal(): ", filename)
+	//}
+	return err
 }
 
-func (l *LanguageTree) buildTree() dataset.Status {
-	var status dataset.Status
+func (l *LanguageTree) buildTree() error {
 	// Make Map of GlottoId
-	for i := range l.table {
-		lang := l.table[i]
+	for i := range l.Table {
+		lang := l.Table[i]
 		l.idMap[lang.GlottoId] = &lang
 	}
 	// Build Tree
@@ -87,7 +91,9 @@ func (l *LanguageTree) buildTree() dataset.Status {
 			parentIdCount++
 			parent, ok := l.idMap[lang.ParentId]
 			if !ok {
-				return log.ErrorNoErr(l.ctx, 500, "Missing parent id: ", lang.ParentId)
+				return errors.New("Missing parent id " + lang.ParentId + " is not known.")
+				//return &db.LangTreeErr{Message: "Missing parent id: " + lang.ParentId}
+				//return db.NewLangTreeErr("", "Missing parent id: " + lang.ParentId)
 			}
 			lang.Parent = parent
 			l.idMap[glottoId] = lang
@@ -103,10 +109,10 @@ func (l *LanguageTree) buildTree() dataset.Status {
 	// Build root
 	for _, lang := range l.idMap {
 		if lang.Parent == nil {
-			l.roots = append(l.roots, lang)
+			l.Roots = append(l.Roots, lang)
 		}
 	}
-	return status
+	return nil
 }
 
 func (l *LanguageTree) searchRelatives(start *db.Language, search string) ([]*db.Language, int) {
@@ -160,7 +166,7 @@ func (l *LanguageTree) descendantSearch(start *db.Language, search string, limit
 	return results, depth
 }
 
-func (l *LanguageTree) validateSearch(search db.ToolName) bool {
+func (l *LanguageTree) validateSearch(search string) bool {
 	switch search {
 	case db.ESpeak:
 		return true
@@ -177,7 +183,7 @@ func (l *LanguageTree) validateSearch(search db.ToolName) bool {
 	}
 }
 
-func (l *LanguageTree) isMatch(lang *db.Language, search db.ToolName) bool {
+func (l *LanguageTree) isMatch(lang *db.Language, search string) bool {
 	switch search {
 	case db.ESpeak:
 		return lang.ESpeak
