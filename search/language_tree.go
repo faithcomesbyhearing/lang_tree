@@ -42,15 +42,10 @@ func (l *LanguageTree) Search(iso6393 string, search string) ([]*db.Language, in
 	var lang *db.Language
 	lang, ok := l.isoMap[iso6393]
 	if !ok {
-		//status = log.ErrorNoErr(l.ctx, 400, "iso code ", iso6393, " is not known.")
-		//err := &db.LangTreeErr{Message: "iso code " + iso6393 + " is not known."}
 		err := errors.New("iso code " + iso6393 + " is not known.")
-		//return results, distance, status
 		return results, distance, err
 	}
 	if !l.validateSearch(search) {
-		//status = log.ErrorNoErr(l.ctx, 400, "Search parameter", search, "is not known")
-		//err := &db.LangTreeErr{Message: "Search parameter" + search + "is not known"}
 		err := errors.New("Search parameter" + search + "is not known")
 		return results, distance, err
 	}
@@ -64,15 +59,9 @@ func (l *LanguageTree) loadTable() error {
 	content, err := os.ReadFile(filename)
 	if err != nil {
 		return err
-		//return &db.LangTreeErr{Err: err, Message: "Error when opening file: " + filename}
-		//return log.Error(l.ctx, 500, err, "Error when opening file: ", filename)
 	}
 	// Parse json into Language slice
 	err = json.Unmarshal(content, &l.Table)
-	//if err != nil {
-	//return &db.LangTreeErr{Err: err, Message: "Error when parsing file: " + filename}
-	//return log.Error(l.ctx, 500, err, "Error during Unmarshal(): ", filename)
-	//}
 	return err
 }
 
@@ -92,8 +81,6 @@ func (l *LanguageTree) buildTree() error {
 			parent, ok := l.idMap[lang.ParentId]
 			if !ok {
 				return errors.New("Missing parent id " + lang.ParentId + " is not known.")
-				//return &db.LangTreeErr{Message: "Missing parent id: " + lang.ParentId}
-				//return db.NewLangTreeErr("", "Missing parent id: " + lang.ParentId)
 			}
 			lang.Parent = parent
 			l.idMap[glottoId] = lang
@@ -120,7 +107,6 @@ func (l *LanguageTree) searchRelatives(start *db.Language, search string) ([]*db
 	var hierDown int
 	var hierUp = -1
 	var limit = 1000
-	//for finalDepth > 0 && limit > 0 {
 	for limit > 0 && start != nil {
 		hierUp++
 		fmt.Println("\nSearching", start.Name, search, limit)
@@ -131,7 +117,6 @@ func (l *LanguageTree) searchRelatives(start *db.Language, search string) ([]*db
 		}
 		if len(results) > 0 {
 			finalLang = results
-			//finalDepth = depth
 			limit = hierDown - 1
 		}
 		start = start.Parent
