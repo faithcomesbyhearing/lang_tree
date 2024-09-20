@@ -2,13 +2,16 @@ package search
 
 import (
 	"context"
+	"embed"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"os"
 )
 
 // https://github.com/espeak-ng/espeak-ng/blob/master/docs/languages.md?plain=1
+
+//go:embed db/*json
+var embedFile embed.FS
 
 type LanguageTree struct {
 	ctx    context.Context
@@ -54,8 +57,8 @@ func (l *LanguageTree) Search(iso6393 string, search string) ([]*Language, int, 
 
 func (l *LanguageTree) loadTable() error {
 	// Read json file of languages
-	filename := "../db/language_tree.json"
-	content, err := os.ReadFile(filename)
+	filename := "db/language_tree.json"
+	content, err := embedFile.ReadFile(filename)
 	if err != nil {
 		return err
 	}

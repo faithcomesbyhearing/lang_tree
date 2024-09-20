@@ -48,7 +48,7 @@ func outputResult(results []*search.Language) {
 	if err != nil {
 		panic(err)
 	}
-	err = os.WriteFile("../db/language_tree.json2", bytes, 0644)
+	err = os.WriteFile("../search/db/language_tree.json2", bytes, 0644)
 	if err != nil {
 		panic(err)
 	}
