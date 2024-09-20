@@ -1,6 +1,6 @@
 # lang_tree
 
-Currently, AI language tools, such as speech-to-text, text-to-speech, 
+AI language tools, such as speech-to-text, text-to-speech, 
 and language-ident have been developed for only a small percentage of the 
 known languages.  As a result when doing AI work on a language that 
 none of the tools process, it is essential to find a language closely 
