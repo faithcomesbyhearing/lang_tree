@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
-	"lang_tree/search"
+	"github.com/garygriswold/lang_tree/search"
 	"os"
 )
 
