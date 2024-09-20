@@ -2,7 +2,6 @@ package search
 
 import (
 	"context"
-	"lang_tree/db"
 	"testing"
 )
 
@@ -18,22 +17,22 @@ func TestLanguageTree_Search(t *testing.T) {
 
 func TestLanguageTree_SampleData(t *testing.T) {
 	// Create a sample language tree
-	var langs = make([]db.Language, 0)
-	langs = append(langs, db.Language{Name: "Indo-European", GlottoId: "indo1319", ParentId: "", Iso6393: "euro"})
+	var langs = make([]Language, 0)
+	langs = append(langs, Language{Name: "Indo-European", GlottoId: "indo1319", ParentId: "", Iso6393: "euro"})
 
-	langs = append(langs, db.Language{Name: "Germanic", GlottoId: "germ1287", ParentId: "indo1319", Iso6393: "germ"})
-	langs = append(langs, db.Language{Name: "Romance", GlottoId: "roma1334", ParentId: "indo1319", Iso6393: "roma"})
-	langs = append(langs, db.Language{Name: "Slavic", GlottoId: "slav1255", ParentId: "indo1319", Iso6393: "slav"})
+	langs = append(langs, Language{Name: "Germanic", GlottoId: "germ1287", ParentId: "indo1319", Iso6393: "germ"})
+	langs = append(langs, Language{Name: "Romance", GlottoId: "roma1334", ParentId: "indo1319", Iso6393: "roma"})
+	langs = append(langs, Language{Name: "Slavic", GlottoId: "slav1255", ParentId: "indo1319", Iso6393: "slav"})
 
-	langs = append(langs, db.Language{Name: "English", GlottoId: "stan1293", ParentId: "germ1287", Iso6393: "eng"})
-	langs = append(langs, db.Language{Name: "German", GlottoId: "stan1295", ParentId: "germ1287", Iso6393: "deu"})
-	langs = append(langs, db.Language{Name: "French", GlottoId: "stan1290", ParentId: "roma1334", Iso6393: "fra"})
-	langs = append(langs, db.Language{Name: "Spanish", GlottoId: "stan1288", ParentId: "roma1334", Iso6393: "spa"})
-	langs = append(langs, db.Language{Name: "Russian", GlottoId: "russ1263", ParentId: "slav1255", Iso6393: "rus"})
+	langs = append(langs, Language{Name: "English", GlottoId: "stan1293", ParentId: "germ1287", Iso6393: "eng"})
+	langs = append(langs, Language{Name: "German", GlottoId: "stan1295", ParentId: "germ1287", Iso6393: "deu"})
+	langs = append(langs, Language{Name: "French", GlottoId: "stan1290", ParentId: "roma1334", Iso6393: "fra"})
+	langs = append(langs, Language{Name: "Spanish", GlottoId: "stan1288", ParentId: "roma1334", Iso6393: "spa"})
+	langs = append(langs, Language{Name: "Russian", GlottoId: "russ1263", ParentId: "slav1255", Iso6393: "rus"})
 
-	langs = append(langs, db.Language{Name: "British", GlottoId: "british", ParentId: "stan1293", Iso6393: "brit"})
-	langs = append(langs, db.Language{Name: "American", GlottoId: "american", ParentId: "stan1293", Iso6393: "amer"})
-	langs = append(langs, db.Language{Name: "Australian", GlottoId: "australian", ParentId: "stan1293", Iso6393: "aust"})
+	langs = append(langs, Language{Name: "British", GlottoId: "british", ParentId: "stan1293", Iso6393: "brit"})
+	langs = append(langs, Language{Name: "American", GlottoId: "american", ParentId: "stan1293", Iso6393: "amer"})
+	langs = append(langs, Language{Name: "Australian", GlottoId: "australian", ParentId: "stan1293", Iso6393: "aust"})
 
 	tree := NewLanguageTree(context.Background())
 	tree.Table = langs

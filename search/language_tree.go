@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"lang_tree/db"
 	"os"
 )
 
@@ -13,17 +12,17 @@ import (
 
 type LanguageTree struct {
 	ctx    context.Context
-	Table  []db.Language
-	Roots  []*db.Language
-	idMap  map[string]*db.Language
-	isoMap map[string]*db.Language
+	Table  []Language
+	Roots  []*Language
+	idMap  map[string]*Language
+	isoMap map[string]*Language
 }
 
 func NewLanguageTree(ctx context.Context) LanguageTree {
 	var l LanguageTree
 	l.ctx = ctx
-	l.idMap = make(map[string]*db.Language)
-	l.isoMap = make(map[string]*db.Language)
+	l.idMap = make(map[string]*Language)
+	l.isoMap = make(map[string]*Language)
 	return l
 }
 
@@ -36,10 +35,10 @@ func (l *LanguageTree) Load() error {
 	return err
 }
 
-func (l *LanguageTree) Search(iso6393 string, search string) ([]*db.Language, int, error) {
-	var results []*db.Language
+func (l *LanguageTree) Search(iso6393 string, search string) ([]*Language, int, error) {
+	var results []*Language
 	var distance int
-	var lang *db.Language
+	var lang *Language
 	lang, ok := l.isoMap[iso6393]
 	if !ok {
 		err := errors.New("iso code " + iso6393 + " is not known.")
@@ -102,8 +101,8 @@ func (l *LanguageTree) buildTree() error {
 	return nil
 }
 
-func (l *LanguageTree) searchRelatives(start *db.Language, search string) ([]*db.Language, int) {
-	var finalLang, results []*db.Language
+func (l *LanguageTree) searchRelatives(start *Language, search string) ([]*Language, int) {
+	var finalLang, results []*Language
 	var hierDown int
 	var hierUp = -1
 	var limit = 1000
@@ -125,8 +124,8 @@ func (l *LanguageTree) searchRelatives(start *db.Language, search string) ([]*db
 }
 
 // DescendantSearch performs a breadth-first search of the LanguageTree
-func (l *LanguageTree) descendantSearch(start *db.Language, search string, limit int) ([]*db.Language, int) {
-	var results []*db.Language
+func (l *LanguageTree) descendantSearch(start *Language, search string, limit int) ([]*Language, int) {
+	var results []*Language
 	var depth int
 	if start == nil {
 		return results, depth
@@ -153,32 +152,32 @@ func (l *LanguageTree) descendantSearch(start *db.Language, search string, limit
 
 func (l *LanguageTree) validateSearch(search string) bool {
 	switch search {
-	case db.ESpeak:
+	case ESpeak:
 		return true
-	case db.MMSASR:
+	case MMSASR:
 		return true
-	case db.MMSLID:
+	case MMSLID:
 		return true
-	case db.MMSTTS:
+	case MMSTTS:
 		return true
-	case db.Whisper:
+	case Whisper:
 		return true
 	default:
 		return false
 	}
 }
 
-func (l *LanguageTree) isMatch(lang *db.Language, search string) bool {
+func (l *LanguageTree) isMatch(lang *Language, search string) bool {
 	switch search {
-	case db.ESpeak:
+	case ESpeak:
 		return lang.ESpeak
-	case db.MMSASR:
+	case MMSASR:
 		return lang.MMSASR
-	case db.MMSLID:
+	case MMSLID:
 		return lang.MMSLID
-	case db.MMSTTS:
+	case MMSTTS:
 		return lang.MMSTTS
-	case db.Whisper:
+	case Whisper:
 		return lang.Whisper
 	default:
 		return false

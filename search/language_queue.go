@@ -1,11 +1,9 @@
 package search
 
-import "lang_tree/db"
-
 // https://reintech.io/blog/breadth-first-search-algorithm-in-go
 
 type LanguageNode struct {
-	Lang  *db.Language
+	Lang  *Language
 	Depth int
 }
 
@@ -21,7 +19,7 @@ func (q *LanguageQueue) Size() int {
 	return len(q.items)
 }
 
-func (q *LanguageQueue) Enqueue(lang *db.Language, depth int) {
+func (q *LanguageQueue) Enqueue(lang *Language, depth int) {
 	q.items = append(q.items, &LanguageNode{Lang: lang, Depth: depth})
 }
 

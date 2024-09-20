@@ -1,4 +1,4 @@
-package db
+package search
 
 const (
 	ESpeak  = "espeak"

@@ -4,8 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"lang_tree/db"
-	"lang_tree/search"
+	"github.com/garygriswold/lang_tree/search"
 	"os"
 	"sort"
 	"testing"
@@ -15,7 +14,7 @@ func TestBuildLanguageTree(t *testing.T) {
 	BuildLanguageTree()
 }
 
-var result []*db.Language
+var result []*search.Language
 var count int
 
 func TestLanguageTree_BuildTree(t *testing.T) {
@@ -36,7 +35,7 @@ func TestLanguageTree_BuildTree(t *testing.T) {
 	outputResult(result)
 }
 
-func recursiveDescent(langs []*db.Language) {
+func recursiveDescent(langs []*search.Language) {
 	for _, lang := range langs {
 		result = append(result, lang)
 		count++
@@ -44,7 +43,7 @@ func recursiveDescent(langs []*db.Language) {
 	}
 }
 
-func outputResult(results []*db.Language) {
+func outputResult(results []*search.Language) {
 	bytes, err := json.MarshalIndent(results, "", "    ")
 	if err != nil {
 		panic(err)

@@ -4,8 +4,8 @@ import (
 	"encoding/csv"
 	"encoding/json"
 	"fmt"
+	"github.com/garygriswold/lang_tree/search"
 	"io"
-	"lang_tree/db"
 	"os"
 	"strconv"
 )
@@ -14,11 +14,11 @@ func BuildLanguageTree() {
 	var numLanguages = 26879
 	languages := loadGlottoLanguoid()
 	languages = loadIso6393(languages)
-	languages = loadAIToolCompatibility(languages, "../data/espeak.tab", db.ESpeak, 1, 3)
-	languages = loadAIToolCompatibility(languages, "../data/mms_asr.tab", db.MMSASR, 0, 1)
-	languages = loadAIToolCompatibility(languages, "../data/mms_lid.tab", db.MMSLID, 0, 1)
-	languages = loadAIToolCompatibility(languages, "../data/mms_tts.tab", db.MMSTTS, 0, 1)
-	languages = loadAIToolCompatibility(languages, "../data/whisper.tab", db.Whisper, 1, 0)
+	languages = loadAIToolCompatibility(languages, "../data/espeak.tab", search.ESpeak, 1, 3)
+	languages = loadAIToolCompatibility(languages, "../data/mms_asr.tab", search.MMSASR, 0, 1)
+	languages = loadAIToolCompatibility(languages, "../data/mms_lid.tab", search.MMSLID, 0, 1)
+	languages = loadAIToolCompatibility(languages, "../data/mms_tts.tab", search.MMSTTS, 0, 1)
+	languages = loadAIToolCompatibility(languages, "../data/whisper.tab", search.Whisper, 1, 0)
 	if len(languages) != numLanguages {
 		fmt.Println("Load Iso6393: Expected ", numLanguages, " got ", len(languages))
 		os.Exit(1)
@@ -26,8 +26,8 @@ func BuildLanguageTree() {
 	outputJSON(languages)
 }
 
-func loadGlottoLanguoid() []db.Language {
-	var languages []db.Language
+func loadGlottoLanguoid() []search.Language {
+	var languages []search.Language
 	file, err := os.Open("../data/languoid.tab")
 	if err != nil {
 		panic(err)
@@ -48,7 +48,7 @@ func loadGlottoLanguoid() []db.Language {
 			first = false
 			continue
 		}
-		var lang db.Language
+		var lang search.Language
 		lang.GlottoId = record[0]
 		lang.FamilyId = record[1]
 		lang.ParentId = record[2]
@@ -69,7 +69,7 @@ func loadGlottoLanguoid() []db.Language {
 	return languages
 }
 
-func loadIso6393(languages []db.Language) []db.Language {
+func loadIso6393(languages []search.Language) []search.Language {
 	var isoMap = make(map[string]string)
 	var inGlotto = make(map[string]bool)
 	var notInIso = make(map[string]bool)
@@ -128,7 +128,7 @@ func loadIso6393(languages []db.Language) []db.Language {
 	return languages
 }
 
-func loadAIToolCompatibility(languages []db.Language, filePath string, toolName string, iso3Col int, nameCol int) []db.Language {
+func loadAIToolCompatibility(languages []search.Language, filePath string, toolName string, iso3Col int, nameCol int) []search.Language {
 	file, err := os.Open(filePath)
 	if err != nil {
 		panic(err)
@@ -172,17 +172,17 @@ func loadAIToolCompatibility(languages []db.Language, filePath string, toolName 
 	return languages
 }
 
-func setLanguage(language db.Language, toolName string) db.Language {
+func setLanguage(language search.Language, toolName string) search.Language {
 	switch toolName {
-	case db.ESpeak:
+	case search.ESpeak:
 		language.ESpeak = true
-	case db.MMSASR:
+	case search.MMSASR:
 		language.MMSASR = true
-	case db.MMSLID:
+	case search.MMSLID:
 		language.MMSLID = true
-	case db.MMSTTS:
+	case search.MMSTTS:
 		language.MMSTTS = true
-	case db.Whisper:
+	case search.Whisper:
 		language.Whisper = true
 	default:
 		panic("Unknown tool name: " + toolName)
@@ -190,7 +190,7 @@ func setLanguage(language db.Language, toolName string) db.Language {
 	return language
 }
 
-func outputJSON(languages []db.Language) {
+func outputJSON(languages []search.Language) {
 	bytes, err := json.MarshalIndent(languages, "", "    ")
 	if err != nil {
 		panic(err)
