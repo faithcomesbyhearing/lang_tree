@@ -38,20 +38,32 @@ func (l *LanguageTree) Load() error {
 	return err
 }
 
-func (l *LanguageTree) Search(iso6393 string, search string) ([]*Language, int, error) {
+func (l *LanguageTree) Search(iso639 string, toolName string) ([]string, int, error) {
+	languages, distance, err := l.DetailSearch(iso639, toolName)
+	if err != nil {
+		return []string{}, distance, err
+	}
+	var results []string
+	for _, lang := range languages {
+		results = append(results, l.isMatch(lang, toolName))
+	}
+	return results, distance, nil
+}
+
+func (l *LanguageTree) DetailSearch(iso639 string, toolName string) ([]*Language, int, error) {
 	var results []*Language
 	var distance int
 	var lang *Language
-	lang, ok := l.isoMap[iso6393]
+	lang, ok := l.isoMap[iso639]
 	if !ok {
-		err := errors.New("iso code " + iso6393 + " is not known.")
+		err := errors.New("iso code " + iso639 + " is not known.")
 		return results, distance, err
 	}
-	if !l.validateSearch(search) {
-		err := errors.New("Search parameter" + search + "is not known")
+	if !l.validateSearch(toolName) {
+		err := errors.New("Search parameter" + toolName + "is not known")
 		return results, distance, err
 	}
-	results, distance = l.searchRelatives(lang, search)
+	results, distance = l.searchRelatives(lang, toolName)
 	return results, distance, nil
 }
 

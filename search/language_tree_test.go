@@ -66,7 +66,7 @@ func setWhisper(tree LanguageTree, glottoIds []string) {
 }
 
 func doSearch(t *testing.T, tree LanguageTree, iso639 string, search string, distance int, result []string) {
-	langs, dist, err := tree.Search(iso639, search)
+	langs, dist, err := tree.DetailSearch(iso639, search)
 	if err != nil {
 		t.Error("status.IsErr:", err)
 	}
