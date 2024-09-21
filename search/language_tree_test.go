@@ -55,12 +55,12 @@ func TestLanguageTree_SampleData(t *testing.T) {
 
 func setWhisper(tree LanguageTree, glottoIds []string) {
 	for id, lang := range tree.idMap {
-		lang.Whisper = false
+		lang.Whisper = ""
 		tree.idMap[id] = lang
 	}
 	for _, id := range glottoIds {
 		lang := tree.idMap[id]
-		lang.Whisper = true
+		lang.Whisper = lang.Iso6393
 		tree.isoMap[id] = lang
 	}
 }

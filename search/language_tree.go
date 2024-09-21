@@ -141,7 +141,7 @@ func (l *LanguageTree) descendantSearch(start *Language, search string, limit in
 			return results, depth
 		}
 		depth = item.Depth
-		if l.isMatch(item.Lang, search) {
+		if l.isMatch(item.Lang, search) != "" {
 			results = append(results, item.Lang)
 		}
 		fmt.Printf("Depth: %d, Name: %s, GlottoId: %s\n", item.Depth, item.Lang.Name, item.Lang.GlottoId)
@@ -170,7 +170,7 @@ func (l *LanguageTree) validateSearch(search string) bool {
 	}
 }
 
-func (l *LanguageTree) isMatch(lang *Language, search string) bool {
+func (l *LanguageTree) isMatch(lang *Language, search string) string {
 	switch search {
 	case ESpeak:
 		return lang.ESpeak
@@ -183,6 +183,6 @@ func (l *LanguageTree) isMatch(lang *Language, search string) bool {
 	case Whisper:
 		return lang.Whisper
 	default:
-		return false
+		return ""
 	}
 }

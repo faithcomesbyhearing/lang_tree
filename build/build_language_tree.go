@@ -150,12 +150,12 @@ func loadAIToolCompatibility(languages []search.Language, filePath string, toolN
 	for i := range languages {
 		name, ok := toolMap[languages[i].Iso6393]
 		if ok {
-			languages[i] = setLanguage(languages[i], toolName)
+			languages[i] = setLanguage(languages[i], toolName, languages[i].Iso6393)
 			usedMap[languages[i].Iso6393] = name
 		} else {
 			name, ok = toolMap[languages[i].Iso6391]
 			if ok {
-				languages[i] = setLanguage(languages[i], toolName)
+				languages[i] = setLanguage(languages[i], toolName, languages[i].Iso6391)
 				usedMap[languages[i].Iso6391] = name
 			}
 		}
@@ -172,18 +172,18 @@ func loadAIToolCompatibility(languages []search.Language, filePath string, toolN
 	return languages
 }
 
-func setLanguage(language search.Language, toolName string) search.Language {
+func setLanguage(language search.Language, toolName string, iso639 string) search.Language {
 	switch toolName {
 	case search.ESpeak:
-		language.ESpeak = true
+		language.ESpeak = iso639
 	case search.MMSASR:
-		language.MMSASR = true
+		language.MMSASR = iso639
 	case search.MMSLID:
-		language.MMSLID = true
+		language.MMSLID = iso639
 	case search.MMSTTS:
-		language.MMSTTS = true
+		language.MMSTTS = iso639
 	case search.Whisper:
-		language.Whisper = true
+		language.Whisper = iso639
 	default:
 		panic("Unknown tool name: " + toolName)
 	}
