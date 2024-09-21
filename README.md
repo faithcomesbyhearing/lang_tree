@@ -19,13 +19,13 @@ language to its children in the hierarchy, a better algorithm can be
 added.
 
 To install this package as a go module:
-> go get github.com/garygriswold/lang_tree.git
+> go get github.com/garygriswold/lang_tree
 
 To use lang_tree in a go program:
 ```
 var tree = NewLanguageTree(ctx context.Context)
 err := tree.Load()
-languages, distance, err := tree.Search(iso639_3 string, aiTool string)
+languages, distance, err := tree.Search(iso639 string, aiTool string)
 ```
 
 The AI tools supported are as follows:
@@ -35,7 +35,17 @@ The AI tools supported are as follows:
 * mms_tts
 * whisper
 
-The Search func returns a slice of type db.Language, which is as follows:
+The search returns a slice of iso639 codes that are related and are
+supported by the AI tool.  The list can be empty if none are found.
+The list will contain multiple, if multiple supported languages are 
+on the same level in the hierarchy.
+
+For the user who wishes to dig deeper, there is another search method.
+```
+languages, distance, err := tree.DetailSearch(iso639 string, aiTool string)
+```
+The DetailSearch, performs the same algorithm, but returns more information.
+It returns a slice of type db.Language, which is as follows:
 ```
 type Language struct {
 	GlottoId    string      `json:"id"`
@@ -47,11 +57,11 @@ type Language struct {
 	Iso6393     string      `json:"iso639_3"`
 	CountryIds  string      `json:"country_ids"`
 	Iso6391     string      `json:"iso639_1"`
-	ESpeak      bool        `json:"espeak"`
-	MMSASR      bool        `json:"mms_asr"`
-	MMSLID      bool        `json:"mms_lid"`
-	MMSTTS      bool        `json:"mms_tts"`
-	Whisper     bool        `json:"whisper"`
+	ESpeak      string      `json:"espeak"`
+	MMSASR      string      `json:"mms_asr"`
+	MMSLID      string      `json:"mms_lid"`
+	MMSTTS      string      `json:"mms_tts"`
+	Whisper     string      `json:"whisper"`
 	Parent      *Language   `json:"-"`
 	Children    []*Language `json:"-"`
 }
