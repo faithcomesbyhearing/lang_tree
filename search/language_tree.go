@@ -5,7 +5,6 @@ import (
 	"embed"
 	"encoding/json"
 	"errors"
-	"fmt"
 )
 
 // https://github.com/espeak-ng/espeak-ng/blob/master/docs/languages.md?plain=1
@@ -104,9 +103,12 @@ func (l *LanguageTree) buildTree() error {
 		if lang.Iso6393 != "" {
 			l.isoMap[lang.Iso6393] = lang
 		}
+		if lang.Iso6391 != "" {
+			l.isoMap[lang.Iso6391] = lang
+		}
 	}
-	fmt.Println("count: ", idMapCount)
-	fmt.Println("parent count: ", parentIdCount)
+	//fmt.Println("count: ", idMapCount)
+	//fmt.Println("parent count: ", parentIdCount)
 	// Build root
 	for _, lang := range l.idMap {
 		if lang.Parent == nil {
@@ -123,12 +125,12 @@ func (l *LanguageTree) searchRelatives(start *Language, search string) ([]*Langu
 	var limit = 1000
 	for limit > 0 && start != nil {
 		hierUp++
-		fmt.Println("\nSearching", start.Name, search, limit)
+		//fmt.Println("\nSearching", start.Name, search, limit)
 		results, hierDown = l.descendantSearch(start, search, limit)
-		fmt.Println("hierUp", hierUp, "hierDown", hierDown, "num", len(results))
-		for _, result := range results {
-			fmt.Println("descendentSearch lang.Name", result.Name)
-		}
+		//fmt.Println("hierUp", hierUp, "hierDown", hierDown, "num", len(results))
+		//for _, result := range results {
+		//	fmt.Println("descendentSearch lang.Name", result.Name)
+		//}
 		if len(results) > 0 {
 			finalLang = results
 			limit = hierDown - 1
@@ -156,7 +158,7 @@ func (l *LanguageTree) descendantSearch(start *Language, search string, limit in
 		if l.isMatch(item.Lang, search) != "" {
 			results = append(results, item.Lang)
 		}
-		fmt.Printf("Depth: %d, Name: %s, GlottoId: %s\n", item.Depth, item.Lang.Name, item.Lang.GlottoId)
+		//fmt.Printf("Depth: %d, Name: %s, GlottoId: %s\n", item.Depth, item.Lang.Name, item.Lang.GlottoId)
 
 		for _, child := range item.Lang.Children {
 			queue.Enqueue(child, item.Depth+1)
