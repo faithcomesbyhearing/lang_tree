@@ -1,6 +1,7 @@
 package build
 
 import (
+	"embed"
 	"encoding/csv"
 	"encoding/json"
 	"fmt"
@@ -10,15 +11,18 @@ import (
 	"strconv"
 )
 
+//go:embed data/*.tab
+var embedFile embed.FS
+
 func BuildLanguageTree() {
 	var numLanguages = 26879
 	languages := loadGlottoLanguoid()
 	languages = loadIso6393(languages)
-	languages = loadAIToolCompatibility(languages, "../data/espeak.tab", search.ESpeak, 1, 3)
-	languages = loadAIToolCompatibility(languages, "../data/mms_asr.tab", search.MMSASR, 0, 1)
-	languages = loadAIToolCompatibility(languages, "../data/mms_lid.tab", search.MMSLID, 0, 1)
-	languages = loadAIToolCompatibility(languages, "../data/mms_tts.tab", search.MMSTTS, 0, 1)
-	languages = loadAIToolCompatibility(languages, "../data/whisper.tab", search.Whisper, 1, 0)
+	languages = loadAIToolCompatibility(languages, "data/espeak.tab", search.ESpeak, 1, 3)
+	languages = loadAIToolCompatibility(languages, "data/mms_asr.tab", search.MMSASR, 0, 1)
+	languages = loadAIToolCompatibility(languages, "data/mms_lid.tab", search.MMSLID, 0, 1)
+	languages = loadAIToolCompatibility(languages, "data/mms_tts.tab", search.MMSTTS, 0, 1)
+	languages = loadAIToolCompatibility(languages, "data/whisper.tab", search.Whisper, 1, 0)
 	if len(languages) != numLanguages {
 		fmt.Println("Load Iso6393: Expected ", numLanguages, " got ", len(languages))
 		os.Exit(1)
@@ -28,7 +32,7 @@ func BuildLanguageTree() {
 
 func loadGlottoLanguoid() []search.Language {
 	var languages []search.Language
-	file, err := os.Open("../data/languoid.tab")
+	file, err := embedFile.Open("data/languoid.tab")
 	if err != nil {
 		panic(err)
 	}
@@ -75,7 +79,7 @@ func loadIso6393(languages []search.Language) []search.Language {
 	var notInIso = make(map[string]bool)
 	var notInGlotto = make(map[string]bool)
 	fmt.Println("Num Glotto Records", len(languages))
-	file, err := os.Open("../data/iso-639-3.tab")
+	file, err := embedFile.Open("data/iso-639-3.tab")
 	if err != nil {
 		panic(err)
 	}
@@ -129,7 +133,7 @@ func loadIso6393(languages []search.Language) []search.Language {
 }
 
 func loadAIToolCompatibility(languages []search.Language, filePath string, toolName string, iso3Col int, nameCol int) []search.Language {
-	file, err := os.Open(filePath)
+	file, err := embedFile.Open(filePath)
 	if err != nil {
 		panic(err)
 	}
