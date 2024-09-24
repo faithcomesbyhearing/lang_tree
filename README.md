@@ -18,6 +18,18 @@ If someone can suggest a statistic that defines the similarity of a
 language to its children in the hierarchy, a better algorithm can be 
 added.
 
+---
+
+Use the lang_tree executable as follows:
+
+```
+Usage: lang_tree [-v] <iso-code> <ai-tool>
+optional -v is used for a detailed response
+iso-code can be any iso639-3 or iso639-1 code
+ai-tool can one of the following: espeak, mms_asr, mms_lid, mms_tts, whisper
+```
+---
+
 To install this package as a go module:
 > go get github.com/garygriswold/lang_tree
 
