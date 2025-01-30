@@ -31,7 +31,7 @@ ai-tool can one of the following: espeak, mms_asr, mms_lid, mms_tts, whisper
 ---
 
 To install this package as a go module:
-> go get github.com/garygriswold/lang_tree
+> go get github.com/faithcomesbyhearing/lang_tree
 
 To use lang_tree in a go program:
 ```
