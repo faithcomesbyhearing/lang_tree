@@ -5,7 +5,7 @@ import (
 	"encoding/csv"
 	"encoding/json"
 	"fmt"
-	"github.com/garygriswold/lang_tree/search"
+	"github.com/faithcomesbyhearing/lang_tree/search"
 	"io"
 	"os"
 	"strconv"
